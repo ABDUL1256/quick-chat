@@ -1,69 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Login / Signup</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{
-  font-family:system-ui;
-  background:#f1f2f6;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
+*{
+  box-sizing:border-box;
 }
+
+body{
+  margin:0;
+  height:100vh;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
+  background:linear-gradient(135deg,#1e90ff,#2ed573);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
 .box{
   background:#fff;
-  padding:25px;
-  width:320px;
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,.1);
-}
-input,button{
   width:100%;
-  padding:12px;
-  margin:8px 0;
+  max-width:360px;
+  padding:28px;
+  border-radius:16px;
+  box-shadow:0 15px 40px rgba(0,0,0,.2);
+  animation:fadeIn .4s ease;
 }
+
+@keyframes fadeIn{
+  from{transform:translateY(20px);opacity:0}
+  to{transform:none;opacity:1}
+}
+
+h2{
+  margin:0 0 15px;
+  text-align:center;
+  color:#2f3542;
+}
+
+input{
+  width:100%;
+  padding:13px;
+  margin:10px 0;
+  border-radius:8px;
+  border:1px solid #dcdde1;
+  font-size:15px;
+}
+
+input:focus{
+  outline:none;
+  border-color:#1e90ff;
+}
+
 button{
-  background:#2ed573;
-  border:0;
+  width:100%;
+  padding:13px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#1e90ff;
   color:#fff;
-  font-weight:bold;
-  border-radius:6px;
-}
-small{
+  font-size:16px;
+  font-weight:600;
   cursor:pointer;
+}
+
+button:hover{
+  background:#187bdb;
+}
+
+.toggle{
+  margin-top:15px;
+  text-align:center;
+  font-size:14px;
   color:#1e90ff;
+  cursor:pointer;
+}
+
+#msg{
+  margin-top:12px;
+  text-align:center;
+  font-size:14px;
+}
+
+.success{color:#2ed573;}
+.error{color:#ff4757;}
+
+.footer{
+  margin-top:18px;
+  text-align:center;
+  font-size:12px;
+  color:#aaa;
 }
 </style>
 </head>
+
 <body>
 
 <div class="box">
-<h2 id="title">Login</h2>
+  <h2 id="title">Login</h2>
 
-<input id="name" placeholder="Name" style="display:none">
-<input id="email" placeholder="Email">
-<input id="pass" type="password" placeholder="Password">
+  <input id="name" placeholder="Full Name" style="display:none">
+  <input id="email" placeholder="Email">
+  <input id="pass" type="password" placeholder="Password">
 
-<button onclick="submit()">Submit</button>
-<small onclick="toggle()">Create account</small>
+  <button onclick="submitForm()">Continue</button>
 
-<p id="msg"></p>
+  <div class="toggle" onclick="toggleForm()">
+    Create new account
+  </div>
+
+  <div id="msg"></div>
+
+  <div class="footer">
+    Secure Login System
+  </div>
 </div>
 
 <script>
 let signup = false;
 
-function toggle(){
+function toggleForm(){
   signup = !signup;
-  document.getElementById("name").style.display = signup?"block":"none";
-  document.getElementById("title").innerText = signup?"Sign Up":"Login";
+  document.getElementById("name").style.display = signup ? "block" : "none";
+  document.getElementById("title").innerText = signup ? "Sign Up" : "Login";
+  document.querySelector(".toggle").innerText =
+    signup ? "Already have an account? Login" : "Create new account";
+  msg.innerHTML = "";
 }
 
-function submit(){
+function submitForm(){
+  msg.innerHTML = "Please wait...";
+  msg.className = "";
+
   let url = signup
     ? "https://yourdomain.infinityfreeapp.com/signup.php"
     : "https://askan.wuaze.com/chat.app/login.php";
@@ -79,9 +151,14 @@ function submit(){
   })
   .then(r=>r.json())
   .then(d=>{
-    msg.innerText = d.status==="success"
+    msg.innerHTML = d.status === "success"
       ? "Success 🎉"
       : d.msg;
+    msg.className = d.status === "success" ? "success" : "error";
+  })
+  .catch(()=>{
+    msg.innerHTML = "Server error";
+    msg.className = "error";
   });
 }
 </script>
