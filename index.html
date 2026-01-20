@@ -2,110 +2,85 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login Demo</title>
+<title>Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-*{box-sizing:border-box}
 body{
-  margin:0;
-  height:100vh;
-  font-family:system-ui;
-  background:linear-gradient(135deg,#1e90ff,#2ed573);
+  font-family: system-ui;
+  background:#0f172a;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
+  height:100vh;
 }
-.box{
+.card{
   background:#fff;
-  width:100%;
-  max-width:360px;
-  padding:28px;
-  border-radius:16px;
-  box-shadow:0 15px 40px rgba(0,0,0,.25);
+  padding:20px;
+  width:320px;
+  border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
-h2{text-align:center;margin-bottom:15px}
 input{
   width:100%;
-  padding:13px;
+  padding:10px;
   margin:10px 0;
-  border-radius:8px;
-  border:1px solid #ddd;
 }
 button{
   width:100%;
-  padding:13px;
-  border:none;
-  border-radius:10px;
-  background:#1e90ff;
+  padding:10px;
+  background:#2563eb;
   color:#fff;
-  font-weight:600;
+  border:none;
+  border-radius:5px;
   cursor:pointer;
 }
-#msg{
-  margin-top:12px;
-  text-align:center;
-  font-size:14px;
-}
-iframe{
-  display:none;
-  width:0;
-  height:0;
-  border:0;
-}
-.note{
-  margin-top:14px;
-  font-size:12px;
-  color:#888;
+.msg{
+  margin-top:10px;
   text-align:center;
 }
 </style>
 </head>
 
 <body>
+<div class="card">
+  <h2>Login</h2>
 
-<div class="box">
-  <h2>Login (Demo)</h2>
-
-  <input id="email" placeholder="Email">
-  <input id="pass" type="password" placeholder="Password">
-
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
   <button onclick="login()">Login</button>
 
-  <div id="msg"></div>
-
-  <div class="note">
-    CORS-safe demo (no fetch)
-  </div>
-
-  <!-- Hidden iframe -->
-  <iframe id="apiFrame"></iframe>
+  <div class="msg" id="msg"></div>
 </div>
 
 <script>
-function login(){
-  msg.innerHTML = "Redirecting to API...";
-  msg.style.color = "#555";
+async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
 
-  if(!email.value || !pass.value){
-    msg.innerHTML = "Email & password required";
-    msg.style.color = "red";
-    return;
+  msg.innerHTML = "Checking...";
+
+  const res = await fetch(
+    "https://edutechx.is-great.org/login.php",
+    {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ email, password })
+    }
+  );
+
+  const data = await res.json();
+
+  if(data.status){
+    msg.style.color="green";
+    msg.innerHTML = "Login success ✅";
+    // window.location.href = "dashboard.html";
+  }else{
+    msg.style.color="red";
+    msg.innerHTML = data.message;
   }
-
-  // ✅ Normal page request (NO CORS, NO fetch)
-  let url =
-    "https://edutechx.is-great.org/login_v2.php"
-    + "?email=" + encodeURIComponent(email.value)
-    + "&password=" + encodeURIComponent(pass.value);
-
-  // Load API inside iframe
-  document.getElementById("apiFrame").src = url;
-
-  msg.innerHTML = "Check API response (login successful if JSON shows success)";
-  msg.style.color = "green";
 }
 </script>
-
 </body>
 </html>
