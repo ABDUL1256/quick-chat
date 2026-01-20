@@ -1,81 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Chat Demo</title>
-
-<!-- Mobile Friendly -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Basic Security & SEO -->
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="robots" content="index, follow">
-<meta name="referrer" content="no-referrer">
+<title>Login / Signup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-*{
-    box-sizing:border-box;
-}
 body{
-    margin:0;
-    padding:0;
-    height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#f1f2f6;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family:system-ui;
+  background:#f1f2f6;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
-.container{
-    background:#ffffff;
-    padding:30px;
-    border-radius:14px;
-    width:90%;
-    max-width:400px;
-    text-align:center;
-    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+.box{
+  background:#fff;
+  padding:25px;
+  width:320px;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
 }
-h1{
-    margin-bottom:10px;
-    color:#2f3542;
+input,button{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
 }
-p{
-    color:#57606f;
-    font-size:15px;
+button{
+  background:#2ed573;
+  border:0;
+  color:#fff;
+  font-weight:bold;
+  border-radius:6px;
 }
-.btn{
-    display:inline-block;
-    margin-top:20px;
-    padding:12px 20px;
-    background:#2ed573;
-    color:#fff;
-    text-decoration:none;
-    border-radius:8px;
-    font-weight:600;
-}
-.btn:hover{
-    background:#26c46d;
-}
-.footer{
-    margin-top:25px;
-    font-size:12px;
-    color:#aaa;
+small{
+  cursor:pointer;
+  color:#1e90ff;
 }
 </style>
 </head>
-
 <body>
 
-<div class="container">
-    <h1>Welcome 👋</h1>
-    <p>This is a safe chat demo page hosted securely.</p>
+<div class="box">
+<h2 id="title">Login</h2>
 
-    <a href="#" class="btn">Enter Chat</a>
+<input id="name" placeholder="Name" style="display:none">
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
 
-    <div class="footer">
-        © 2026 Chat Demo
-    </div>
+<button onclick="submit()">Submit</button>
+<small onclick="toggle()">Create account</small>
+
+<p id="msg"></p>
 </div>
+
+<script>
+let signup = false;
+
+function toggle(){
+  signup = !signup;
+  document.getElementById("name").style.display = signup?"block":"none";
+  document.getElementById("title").innerText = signup?"Sign Up":"Login";
+}
+
+function submit(){
+  let url = signup
+    ? "https://yourdomain.infinityfreeapp.com/signup.php"
+    : "https://yourdomain.infinityfreeapp.com/login.php";
+
+  fetch(url,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      name: name.value,
+      email: email.value,
+      password: pass.value
+    })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    msg.innerText = d.status==="success"
+      ? "Success 🎉"
+      : d.msg;
+  });
+}
+</script>
 
 </body>
 </html>
