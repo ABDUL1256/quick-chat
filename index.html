@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login / Signup</title>
+<title>Login Demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -10,7 +10,7 @@
 body{
   margin:0;
   height:100vh;
-  font-family:system-ui;
+  font-family:system-ui,-apple-system;
   background:linear-gradient(135deg,#1e90ff,#2ed573);
   display:flex;
   justify-content:center;
@@ -22,15 +22,20 @@ body{
   max-width:360px;
   padding:28px;
   border-radius:16px;
-  box-shadow:0 15px 40px rgba(0,0,0,.2);
+  box-shadow:0 15px 40px rgba(0,0,0,.25);
 }
-h2{text-align:center;margin-bottom:15px}
+h2{
+  text-align:center;
+  margin-bottom:16px;
+  color:#2f3542;
+}
 input{
   width:100%;
   padding:13px;
   margin:10px 0;
   border-radius:8px;
   border:1px solid #ddd;
+  font-size:15px;
 }
 button{
   width:100%;
@@ -39,14 +44,19 @@ button{
   border-radius:10px;
   background:#1e90ff;
   color:#fff;
+  font-size:16px;
   font-weight:600;
   cursor:pointer;
 }
+button:hover{
+  background:#187bdb;
+}
 .toggle{
-  text-align:center;
   margin-top:14px;
+  text-align:center;
   color:#1e90ff;
   cursor:pointer;
+  font-size:14px;
 }
 #msg{
   margin-top:12px;
@@ -55,68 +65,75 @@ button{
 }
 .success{color:#2ed573}
 .error{color:#ff4757}
+.footer{
+  margin-top:18px;
+  text-align:center;
+  font-size:12px;
+  color:#aaa;
+}
 </style>
 </head>
 
 <body>
 
 <div class="box">
-  <h2 id="title">Login v2</h2>
+  <h2 id="title">Login okk</h2>
 
-  <input id="name" placeholder="Full Name" style="display:none">
   <input id="email" placeholder="Email">
   <input id="pass" type="password" placeholder="Password">
 
-  <button onclick="submitForm()">Continue</button>
+  <button onclick="submitForm()">Login</button>
 
-  <div class="toggle" onclick="toggleForm()">
-    Create new account
+  <div class="toggle" onclick="showInfo()">
+    Demo mode (GET request)
   </div>
 
   <div id="msg"></div>
+
+  <div class="footer">
+    GitHub Pages × Free Hosting API
+  </div>
 </div>
 
 <script>
-let signup = false;
-
-function toggleForm(){
-  signup = !signup;
-  name.style.display = signup ? "block" : "none";
-  title.innerText = signup ? "Sign Up" : "Login";
-  document.querySelector(".toggle").innerText =
-    signup ? "Already have an account? Login" : "Create new account";
-  msg.innerHTML = "";
+function showInfo(){
+  alert("This is a demo login using GET request.\nBackend: edutechx.is-great.org");
 }
 
 function submitForm(){
-  msg.innerHTML = "Please wait...";
+  msg.innerHTML = "Checking...";
   msg.className = "";
 
-  let url = signup
-    ? "https://edutechx.is-great.org/login_v2.php"
-    : "https://edutechx.is-great.org/login_v2.php";
-
-  // ✅ FormData = NO CORS preflight
-  let fd = new FormData();
-  fd.append("name", name.value);
-  fd.append("email", email.value);
-  fd.append("password", pass.value);
-
-  fetch(url,{
-    method:"POST",
-    body: fd
-  })
-  .then(r => r.text())
-  .then(t => {
-    let d = JSON.parse(t);
-    msg.innerHTML = d.status==="success" ? "Success 🎉" : d.msg;
-    msg.className = d.status==="success" ? "success" : "error";
-  })
-  .catch(()=>{
-    msg.innerHTML = "Network error";
+  if(!email.value || !pass.value){
+    msg.innerHTML = "Email & password required";
     msg.className = "error";
-  });
+    return;
+  }
+
+  // ✅ GET fetch (NO CORS / NO preflight / NO network error)
+  let url =
+    "https://edutechx.is-great.org/login_v2.php"
+    + "?email=" + encodeURIComponent(email.value)
+    + "&password=" + encodeURIComponent(pass.value);
+
+  fetch(url)
+    .then(r => r.json())
+    .then(d => {
+      if(d.status === "success"){
+        msg.innerHTML = "Welcome " + d.name + " 🎉";
+        msg.className = "success";
+      }else{
+        msg.innerHTML = d.msg;
+        msg.className = "error";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      msg.innerHTML = "Network error";
+      msg.className = "error";
+    });
 }
 </script>
+
 </body>
 </html>
