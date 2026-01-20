@@ -93,28 +93,24 @@ function submitForm(){
   msg.className = "";
 
   let url = signup
-    ? "https://yourdomain.infinityfreeapp.com/signup.php"
+    ? "https://edutechx.is-great.org/signup.php"
     : "https://edutechx.is-great.org/login_v2.php";
+
+  // ✅ FormData = NO CORS preflight
+  let fd = new FormData();
+  fd.append("name", name.value);
+  fd.append("email", email.value);
+  fd.append("password", pass.value);
 
   fetch(url,{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      name: name.value,
-      email: email.value,
-      password: pass.value
-    })
+    body: fd
   })
-  .then(r=>r.text())
-  .then(t=>{
-    try{
-      let d = JSON.parse(t);
-      msg.innerHTML = d.status==="success" ? "Success 🎉" : d.msg;
-      msg.className = d.status==="success" ? "success" : "error";
-    }catch{
-      msg.innerHTML = "Server error";
-      msg.className = "error";
-    }
+  .then(r => r.text())
+  .then(t => {
+    let d = JSON.parse(t);
+    msg.innerHTML = d.status==="success" ? "Success 🎉" : d.msg;
+    msg.className = d.status==="success" ? "success" : "error";
   })
   .catch(()=>{
     msg.innerHTML = "Network error";
