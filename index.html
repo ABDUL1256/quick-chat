@@ -2,142 +2,182 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baby Learning App</title>
 
 <style>
 *{
     box-sizing:border-box;
-    font-family: "Segoe UI", system-ui, -apple-system;
+    font-family:'Comic Sans MS', system-ui;
 }
 body{
     margin:0;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
     height:100vh;
     display:flex;
-    align-items:center;
     justify-content:center;
-    background:linear-gradient(135deg,#4f46e5,#06b6d4);
+    align-items:center;
 }
-.login-box{
+.app{
+    width:100%;
+    max-width:420px;
+    height:100vh;
     background:#fff;
-    width:100%;
-    max-width:380px;
-    padding:30px;
-    border-radius:14px;
-    box-shadow:0 20px 40px rgba(0,0,0,.2);
+    border-radius:18px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
 }
-.login-box h2{
-    margin:0 0 20px;
-    text-align:center;
-}
-.input{
-    width:100%;
-    padding:12px 14px;
-    margin-bottom:14px;
-    border-radius:10px;
-    border:1px solid #ddd;
-    font-size:15px;
-}
-.input:focus{
-    outline:none;
-    border-color:#4f46e5;
-}
-button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#4f46e5;
+.header{
+    background:#ff6f61;
     color:#fff;
-    font-size:16px;
-    cursor:pointer;
-}
-button:disabled{
-    opacity:.7;
-    cursor:not-allowed;
-}
-.msg{
-    margin-top:14px;
+    padding:15px;
     text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+.menu{
+    display:flex;
+    justify-content:space-around;
+    padding:10px;
+    background:#ffe0e0;
+}
+.menu button{
+    border:none;
+    padding:10px 16px;
+    border-radius:20px;
+    background:#ff6f61;
+    color:#fff;
     font-size:14px;
 }
-.msg.error{color:#dc2626;}
-.msg.success{color:#16a34a;}
+.content{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+.card{
+    width:85%;
+    height:220px;
+    border-radius:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:90px;
+    color:#fff;
+    margin-bottom:15px;
+}
+.controls button{
+    font-size:22px;
+    padding:12px 22px;
+    margin:5px;
+    border:none;
+    border-radius:50px;
+    background:#4CAF50;
+    color:#fff;
+}
 </style>
 </head>
 
 <body>
 
-<div class="login-box">
-    <h2>Login user</h2>
+<div class="app">
+    <div class="header">👶 Baby Learning</div>
 
-    <input type="email" id="email" class="input" placeholder="Email">
-    <input type="password" id="password" class="input" placeholder="Password">
+    <div class="menu">
+        <button onclick="setMode('abc')">ABC</button>
+        <button onclick="setMode('123')">123</button>
+        <button onclick="setMode('color')">Colors</button>
+    </div>
 
-    <button id="btn" onclick="login()">Login</button>
+    <div class="content">
+        <div id="card" class="card">A</div>
 
-    <div id="msg" class="msg"></div>
+        <div class="controls">
+            <button onclick="prev()">⬅️</button>
+            <button onclick="speak()">🔊</button>
+            <button onclick="next()">➡️</button>
+        </div>
+    </div>
 </div>
 
 <script>
-const API_URL = "https://edutechx.is-great.org/login.php";
+let mode = "abc";
+let index = 0;
 
-function login(){
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-    const msg = document.getElementById("msg");
-    const btn = document.getElementById("btn");
+const abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
-    msg.textContent = "";
-    msg.className = "msg";
+// 🔢 Numbers 1 to 100
+const numbers = Array.from({length:100},(_,i)=>(i+1).toString());
 
-    if(!email || !password){
-        msg.textContent = "Email & password required";
-        msg.classList.add("error");
-        return;
-    }
+const colors = [
+    {name:"Red", color:"#ff4d4d"},
+    {name:"Green", color:"#4CAF50"},
+    {name:"Blue", color:"#2196F3"},
+    {name:"Yellow", color:"#FFEB3B"},
+    {name:"Pink", color:"#E91E63"},
+    {name:"Orange", color:"#FF9800"},
+    {name:"Purple", color:"#9C27B0"}
+];
 
-    btn.disabled = true;
-    btn.textContent = "Please wait...";
+const card = document.getElementById("card");
 
-    fetch(API_URL,{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({ email, password })
-    })
-    .then(async res=>{
-        if(!res.ok){
-            const t = await res.text();
-            throw new Error("HTTP "+res.status+" "+t);
-        }
-        return res.json();
-    })
-    .then(data=>{
-        if(data.status==="success"){
-            msg.textContent = "Welcome " + data.name;
-            msg.className = "msg success";
-
-            localStorage.setItem("uid", data.id);
-            localStorage.setItem("name", data.name);
-
-            // window.location.href = "dashboard.html";
-        }else{
-            msg.textContent = data.msg || "Login failed";
-            msg.className = "msg error";
-        }
-    })
-    .catch(err=>{
-        console.error(err);
-        msg.textContent = "Server / CORS error";
-        msg.className = "msg error";
-    })
-    .finally(()=>{
-        btn.disabled = false;
-        btn.textContent = "Login";
-    });
+function setMode(m){
+    mode = m;
+    index = 0;
+    update();
 }
+
+function update(){
+    if(mode==="abc"){
+        card.style.background="#ff6f61";
+        card.innerText = abc[index];
+    }
+    if(mode==="123"){
+        card.style.background="#3f51b5";
+        card.innerText = numbers[index];
+    }
+    if(mode==="color"){
+        card.style.background = colors[index].color;
+        card.innerText = "";
+    }
+}
+
+function next(){
+    let arr = getArray();
+    index = (index + 1) % arr.length;
+    update();
+    speak();
+}
+
+function prev(){
+    let arr = getArray();
+    index = (index - 1 + arr.length) % arr.length;
+    update();
+    speak();
+}
+
+function getArray(){
+    if(mode==="abc") return abc;
+    if(mode==="123") return numbers;
+    if(mode==="color") return colors;
+}
+
+function speak(){
+    let text = "";
+    if(mode==="abc") text = abc[index];
+    if(mode==="123") text = numbers[index];
+    if(mode==="color") text = colors[index].name;
+
+    let msg = new SpeechSynthesisUtterance(text);
+    msg.rate = 0.8;
+    msg.pitch = 1.3;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(msg);
+}
+
+update();
 </script>
 
 </body>
