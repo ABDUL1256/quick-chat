@@ -10,7 +10,7 @@
 body{
   margin:0;
   height:100vh;
-  font-family:system-ui,-apple-system;
+  font-family:system-ui;
   background:linear-gradient(135deg,#1e90ff,#2ed573);
   display:flex;
   justify-content:center;
@@ -24,18 +24,13 @@ body{
   border-radius:16px;
   box-shadow:0 15px 40px rgba(0,0,0,.25);
 }
-h2{
-  text-align:center;
-  margin-bottom:16px;
-  color:#2f3542;
-}
+h2{text-align:center;margin-bottom:15px}
 input{
   width:100%;
   padding:13px;
   margin:10px 0;
   border-radius:8px;
   border:1px solid #ddd;
-  font-size:15px;
 }
 button{
   width:100%;
@@ -44,32 +39,25 @@ button{
   border-radius:10px;
   background:#1e90ff;
   color:#fff;
-  font-size:16px;
   font-weight:600;
   cursor:pointer;
-}
-button:hover{
-  background:#187bdb;
-}
-.toggle{
-  margin-top:14px;
-  text-align:center;
-  color:#1e90ff;
-  cursor:pointer;
-  font-size:14px;
 }
 #msg{
   margin-top:12px;
   text-align:center;
   font-size:14px;
 }
-.success{color:#2ed573}
-.error{color:#ff4757}
-.footer{
-  margin-top:18px;
-  text-align:center;
+iframe{
+  display:none;
+  width:0;
+  height:0;
+  border:0;
+}
+.note{
+  margin-top:14px;
   font-size:12px;
-  color:#aaa;
+  color:#888;
+  text-align:center;
 }
 </style>
 </head>
@@ -77,61 +65,45 @@ button:hover{
 <body>
 
 <div class="box">
-  <h2 id="title">Login okk</h2>
+  <h2>Login (Demo)</h2>
 
   <input id="email" placeholder="Email">
   <input id="pass" type="password" placeholder="Password">
 
-  <button onclick="submitForm()">Login</button>
-
-  <div class="toggle" onclick="showInfo()">
-    Demo mode (GET request)
-  </div>
+  <button onclick="login()">Login</button>
 
   <div id="msg"></div>
 
-  <div class="footer">
-    GitHub Pages × Free Hosting API
+  <div class="note">
+    CORS-safe demo (no fetch)
   </div>
+
+  <!-- Hidden iframe -->
+  <iframe id="apiFrame"></iframe>
 </div>
 
 <script>
-function showInfo(){
-  alert("This is a demo login using GET request.\nBackend: edutechx.is-great.org");
-}
-
-function submitForm(){
-  msg.innerHTML = "Checking...";
-  msg.className = "";
+function login(){
+  msg.innerHTML = "Redirecting to API...";
+  msg.style.color = "#555";
 
   if(!email.value || !pass.value){
     msg.innerHTML = "Email & password required";
-    msg.className = "error";
+    msg.style.color = "red";
     return;
   }
 
-  // ✅ GET fetch (NO CORS / NO preflight / NO network error)
+  // ✅ Normal page request (NO CORS, NO fetch)
   let url =
     "https://edutechx.is-great.org/login_v2.php"
     + "?email=" + encodeURIComponent(email.value)
     + "&password=" + encodeURIComponent(pass.value);
 
-  fetch(url)
-    .then(r => r.json())
-    .then(d => {
-      if(d.status === "success"){
-        msg.innerHTML = "Welcome " + d.name + " 🎉";
-        msg.className = "success";
-      }else{
-        msg.innerHTML = d.msg;
-        msg.className = "error";
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      msg.innerHTML = "Network error";
-      msg.className = "error";
-    });
+  // Load API inside iframe
+  document.getElementById("apiFrame").src = url;
+
+  msg.innerHTML = "Check API response (login successful if JSON shows success)";
+  msg.style.color = "green";
 }
 </script>
 
